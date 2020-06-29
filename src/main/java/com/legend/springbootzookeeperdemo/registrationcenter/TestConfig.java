@@ -1,10 +1,6 @@
 package com.legend.springbootzookeeperdemo.registrationcenter;
 
-import org.apache.zookeeper.AsyncCallback;
-import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
-import org.apache.zookeeper.data.Stat;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +25,20 @@ public class TestConfig {
     @Test
     public void getConf(){
         WatcherCallback watcherCallback = new WatcherCallback();
-        zk.exists("/redis", watcherCallback, watcherCallback, "123");
+        watcherCallback.setZk(zk);
+        MyConf myConf = new MyConf();
+        watcherCallback.setMyConf(myConf);
+        watcherCallback.await();
+        //1.节点不存在
+        //2.几点存在的时候
+        while(true){
+            System.out.println(myConf.getConf());
+            System.out.println("AAAAAAAAAAAAAAA");
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
-
 }

@@ -1,3 +1,4 @@
+
 package com.legend.springbootzookeeperdemo.registrationcenter;
 
 import org.apache.zookeeper.AsyncCallback;
@@ -6,8 +7,12 @@ import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
 
+import java.util.concurrent.CountDownLatch;
+
 public class WatcherCallback implements Watcher, AsyncCallback.StatCallback, AsyncCallback.DataCallback {
     private ZooKeeper zk;
+    private MyConf myConf;
+    private CountDownLatch lock = new CountDownLatch(1);
 
     public ZooKeeper getZk() {
         return zk;
@@ -17,20 +22,64 @@ public class WatcherCallback implements Watcher, AsyncCallback.StatCallback, Asy
         this.zk = zk;
     }
 
-    @Override
-    public void processResult(int i, String s, Object o, byte[] bytes, Stat stat) {
+    public MyConf getMyConf() {
+        return myConf;
+    }
 
+    public void setMyConf(MyConf myConf) {
+        this.myConf = myConf;
+    }
+
+    public void await(){
+        zk.exists("/AppConf", this, this, "abc");
+        try {
+            lock.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public void processResult(int i, String s, Object o, Stat stat) {
+    public void processResult(int code, String path, Object ctx, byte[] data, Stat stat) {
+        if(data != null){
+            String s = new String(data);
+            myConf.setConf(s);
+            lock.countDown();
+        }
+    }
+
+    @Override
+    public void processResult(int code, String path, Object o, Stat stat) {
         if(stat != null){
             zk.getData("/AppConf", this, this, "abc");
         }
     }
 
     @Override
-    public void process(WatchedEvent watchedEvent) {
-
+    public void process(WatchedEvent event) {
+        switch (event.getType()) {
+            case None:
+                break;
+            case NodeCreated:
+                System.out.println("Node is created");
+                zk.getData("/AppConf", this, this, "abc");
+                break;
+            case NodeDeleted:
+                System.out.println("Node is deleted");
+                myConf.setConf("");
+                lock = new CountDownLatch(1);
+                break;
+            case NodeDataChanged:
+                zk.getData("/AppConf", this, this, "abc");
+                break;
+            case NodeChildrenChanged:
+                break;
+            case DataWatchRemoved:
+                break;
+            case ChildWatchRemoved:
+                break;
+            case PersistentWatchRemoved:
+                break;
+        }
     }
 }
