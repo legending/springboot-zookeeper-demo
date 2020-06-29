@@ -5,6 +5,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+/*
+* 如果节/AppConf节点本身不存在，然后新建是可以捕获到的
+* 但节点如果存在，删除时可以捕获到，如果再新建就捕获不到了，如果想重新捕获到就只能在while(true)循环里再次判断并调用await
+* 由此可见watch是一次性的
+* */
+
 public class TestConfig {
     private ZooKeeper zk;
 
@@ -32,8 +38,11 @@ public class TestConfig {
         //1.节点不存在
         //2.几点存在的时候
         while(true){
-            System.out.println(myConf.getConf());
-            System.out.println("AAAAAAAAAAAAAAA");
+            if(myConf.getConf().equals("")){
+                watcherCallback.await();
+            }else{
+                System.out.println(myConf.getConf());
+            }
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
