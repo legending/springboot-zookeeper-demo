@@ -40,7 +40,7 @@ public class WatcherCallback implements Watcher, AsyncCallback.StatCallback, Asy
     }
 
     @Override
-    public void processResult(int code, String path, Object ctx, byte[] data, Stat stat) {
+    public void processResult(int code, String path, Object ctx, byte[] data, Stat stat) {//获取数据后执行的回调方法
         if(data != null){
             String s = new String(data);
             myConf.setConf(s);
@@ -49,14 +49,14 @@ public class WatcherCallback implements Watcher, AsyncCallback.StatCallback, Asy
     }
 
     @Override
-    public void processResult(int code, String path, Object o, Stat stat) {
+    public void processResult(int code, String path, Object o, Stat stat) {//获取状态（exists）后执行的回调方法
         if(stat != null){
             zk.getData("/AppConf", this, this, "abc");
         }
     }
 
     @Override
-    public void process(WatchedEvent event) {
+    public void process(WatchedEvent event) {//事件的回调方法
         switch (event.getType()) {
             case None:
                 break;
