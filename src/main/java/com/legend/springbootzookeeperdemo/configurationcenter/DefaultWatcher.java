@@ -1,4 +1,4 @@
-package com.legend.springbootzookeeperdemo.registrationcenter;
+package com.legend.springbootzookeeperdemo.configurationcenter;
 
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
@@ -6,10 +6,10 @@ import org.apache.zookeeper.Watcher;
 import java.util.concurrent.CountDownLatch;
 
 public class DefaultWatcher implements Watcher {
-    private static  CountDownLatch cdl;
+    private static  CountDownLatch latch;
 
     public void setLock(CountDownLatch cdl){
-        this.cdl = cdl;
+        this.latch = cdl;
     }
 
     @Override
@@ -22,7 +22,7 @@ public class DefaultWatcher implements Watcher {
             case NoSyncConnected:
                 break;
             case SyncConnected:
-                cdl.countDown();
+                latch.countDown();
                 System.out.println("zookeeper client connected");
                 break;
             case AuthFailed:

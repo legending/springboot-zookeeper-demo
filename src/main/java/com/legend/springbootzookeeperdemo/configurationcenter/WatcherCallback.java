@@ -1,5 +1,5 @@
 
-package com.legend.springbootzookeeperdemo.registrationcenter;
+package com.legend.springbootzookeeperdemo.configurationcenter;
 
 import org.apache.zookeeper.AsyncCallback;
 import org.apache.zookeeper.WatchedEvent;
@@ -12,7 +12,7 @@ import java.util.concurrent.CountDownLatch;
 public class WatcherCallback implements Watcher, AsyncCallback.StatCallback, AsyncCallback.DataCallback {
     private ZooKeeper zk;
     private MyConf myConf;
-    private CountDownLatch lock = new CountDownLatch(1);
+    private CountDownLatch latch = new CountDownLatch(1);
 
     public ZooKeeper getZk() {
         return zk;
@@ -33,7 +33,7 @@ public class WatcherCallback implements Watcher, AsyncCallback.StatCallback, Asy
     public void await(){
         zk.exists("/AppConf", this, this, "abc");
         try {
-            lock.await();
+            latch.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -44,7 +44,7 @@ public class WatcherCallback implements Watcher, AsyncCallback.StatCallback, Asy
         if(data != null){
             String s = new String(data);
             myConf.setConf(s);
-            lock.countDown();
+            latch.countDown();
         }
     }
 
@@ -67,7 +67,7 @@ public class WatcherCallback implements Watcher, AsyncCallback.StatCallback, Asy
             case NodeDeleted:
                 System.out.println("Node is deleted");
                 myConf.setConf("");
-                lock = new CountDownLatch(1);
+                latch = new CountDownLatch(1);
                 break;
             case NodeDataChanged:
                 zk.getData("/AppConf", this, this, "abc");

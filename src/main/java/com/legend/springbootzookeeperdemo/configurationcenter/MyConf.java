@@ -1,4 +1,4 @@
-package com.legend.springbootzookeeperdemo.registrationcenter;
+package com.legend.springbootzookeeperdemo.configurationcenter;
 
 public class MyConf {
     private String conf;

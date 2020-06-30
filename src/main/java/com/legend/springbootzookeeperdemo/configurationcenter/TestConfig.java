@@ -1,5 +1,6 @@
-package com.legend.springbootzookeeperdemo.registrationcenter;
+package com.legend.springbootzookeeperdemo.configurationcenter;
 
+import com.legend.springbootzookeeperdemo.ZKUtils;
 import org.apache.zookeeper.ZooKeeper;
 import org.junit.After;
 import org.junit.Before;
@@ -16,7 +17,7 @@ public class TestConfig {
 
     @Before
     public void conn(){
-        zk = ZKUtils.getZK();
+        zk = ZKUtils.getZK("ConfigurationCenterTest");
     }
 
     @After
